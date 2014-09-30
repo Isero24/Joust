@@ -24,6 +24,16 @@ namespace Joust
         protected Vector2 position;                     // Position at which to draw sprite
         protected Vector2 previousPosition;             // Previous position of the sprite
 
+        public Point animationStop;
+
+        protected enum State
+        {
+            Moving,
+            Stop
+        }
+
+        protected State state;
+
         public Sprite(Texture2D textureImage, Vector2 position, Point frameSize, Point frameStart,
             int collisionOffset, int scale, Point currentFrame, Point sheetSize, Vector2 speed)
             : this(textureImage, position, frameSize, frameStart, collisionOffset, scale, currentFrame,
@@ -46,11 +56,12 @@ namespace Joust
             this.sheetSize = sheetSize;
             this.speed = speed;
             this.millisecondsPerFrame = millisecondsPerFrame;
+            this.state = State.Stop;
         }
 
         public virtual void Update(GameTime gameTime, Rectangle clientBounds)
         {
-            if (previousPosition != position)
+            if (state == State.Moving)
             {
                 timeSinceLastFrame += gameTime.ElapsedGameTime.Milliseconds;
                 if (timeSinceLastFrame > millisecondsPerFrame)
@@ -66,21 +77,30 @@ namespace Joust
                     }
                 }
             }
-            else
-            {
-                
-            }
         }
 
         public virtual void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
-            spriteBatch.Draw(textureImage,
-                position,
-                new Rectangle(frameStart.X + currentFrame.X * frameSize.X,
-                    frameStart.Y + currentFrame.Y * frameSize.Y,
-                    frameSize.X, frameSize.Y),
-                Color.White, 0, Vector2.Zero,
-                scale, SpriteEffects.None, 0);
+            if (state == State.Stop)
+            {
+                spriteBatch.Draw(textureImage,
+                    position,
+                    new Rectangle(animationStop.X,
+                        animationStop.Y,
+                        frameSize.X, frameSize.Y),
+                    Color.White, 0, Vector2.Zero,
+                    scale, SpriteEffects.None, 0);
+            }
+            else
+            {
+                spriteBatch.Draw(textureImage,
+                    position,
+                    new Rectangle(frameStart.X + currentFrame.X * frameSize.X,
+                        frameStart.Y + currentFrame.Y * frameSize.Y,
+                        frameSize.X, frameSize.Y),
+                    Color.White, 0, Vector2.Zero,
+                    scale, SpriteEffects.None, 0);
+            }
         }
 
         public abstract Vector2 direction

@@ -97,6 +97,12 @@ namespace Joust
             // TODO: Add your drawing code here
 
             base.Draw(gameTime);
+
+        }
+
+        protected void wait(int x)
+        {
+            for (int y = 0; y < x; y++) { }
         }
     }
 }

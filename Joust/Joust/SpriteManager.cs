@@ -21,8 +21,11 @@ namespace Joust
     public class SpriteManager : Microsoft.Xna.Framework.DrawableGameComponent
     {
         SpriteBatch spriteBatch;
+
         UserControlledSprite player;
+
         List<Sprite> spriteList = new List<Sprite>();
+
         AutomatedSprite background;
 
         public SpriteManager(Game game)
@@ -51,6 +54,8 @@ namespace Joust
                 Vector2.Zero, new Point(15, 20), new Point(247, 62), 10, 3, new Point(0, 0), 
                 new Point(4, 1), new Vector2(0, 0), 50);
 
+            player.animationStop = new Point(247, 42);
+
             background = new AutomatedSprite(
                 Game.Content.Load<Texture2D>("JoustSheet"),
                 Vector2.Zero, new Point(236, 194), new Point(2, 44), 10, 3, new Point(0, 0),
@@ -59,9 +64,7 @@ namespace Joust
             spriteList.Add(new AutomatedSprite(
                 Game.Content.Load<Texture2D>("JoustSheet"),
                 Vector2.Zero, new Point(15, 20), new Point(247, 192), 10, 3, new Point(0, 0),
-                new Point(4, 1), new Vector2(0, 0), 50));
-
-            
+                new Point(4, 1), new Vector2(0, 0), 50));          
 
             base.LoadContent();
         }
@@ -73,7 +76,7 @@ namespace Joust
         public override void Update(GameTime gameTime)
         {
             // TODO: Add your update code here
-
+            
             // Update background
             background.Update(gameTime, Game.Window.ClientBounds);
 
