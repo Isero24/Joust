@@ -51,20 +51,17 @@ namespace Joust
 
             player = new UserControlledSprite(
                 Game.Content.Load<Texture2D>("JoustSheet"),
-                Vector2.Zero, new Point(15, 20), new Point(247, 62), 10, 3, new Point(0, 0), 
-                new Point(4, 1), new Vector2(0, 0), 50);
+                Vector2.Zero, new Point(15, 20), new Point(247, 62), 10, 3, new Point(0, 0),
+                new Point(4, 1), new Vector2(0, 0), 50,
+                new Dictionary<string, animate>()
+                {
+                    {"default", new animate {animationName = "walking", fStart = new Point(247, 62), sSize = new Point(4, 1)}},
+                    {"walking", new animate {animationName = "walking", fStart = new Point(247, 62), sSize = new Point(4, 1)}}
+                }
 
-            player.animationStop = new Point(247, 42);
-
-            background = new AutomatedSprite(
-                Game.Content.Load<Texture2D>("JoustSheet"),
-                Vector2.Zero, new Point(236, 194), new Point(2, 44), 10, 3, new Point(0, 0),
-                new Point(1, 1), new Vector2(0, 0), 0);
-
-            spriteList.Add(new AutomatedSprite(
-                Game.Content.Load<Texture2D>("JoustSheet"),
-                Vector2.Zero, new Point(15, 20), new Point(247, 192), 10, 3, new Point(0, 0),
-                new Point(4, 1), new Vector2(0, 0), 50));          
+                );
+        
+            
 
             base.LoadContent();
         }

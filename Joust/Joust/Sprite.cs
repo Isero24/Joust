@@ -8,11 +8,21 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Joust
 {
+    struct animate
+    {
+        public string animationName;
+        public Point fStart;
+        public Point sSize;
+    }
+
+    enum State { Moving, Stop }
+
     abstract class Sprite
     {
         Texture2D textureImage;                         // Sprite or psrite sheet of image being drawn
         protected Point frameSize;                      // Size of each individual frame in sprite sheet
         protected Point frameStart;                     // Start location of the sprite on the sheet
+
         Point currentFrame;                             // Index of current frame in sprite sheet
         Point sheetSize;                                // Number of columns/rows in sprite sheet
         int collisionOffset;                            // Offset used to modify frame-size rectangle for collision checks against this sprite
@@ -24,83 +34,67 @@ namespace Joust
         protected Vector2 position;                     // Position at which to draw sprite
         protected Vector2 previousPosition;             // Previous position of the sprite
 
-        public Point animationStop;
+        public State state;
 
-        protected enum State
-        {
-            Moving,
-            Stop
-        }
+        Dictionary<string, animate> animations;
 
-        protected State state;
+        animate defaultAnimation;
 
         public Sprite(Texture2D textureImage, Vector2 position, Point frameSize, Point frameStart,
-            int collisionOffset, int scale, Point currentFrame, Point sheetSize, Vector2 speed)
+            int collisionOffset, int scale, Point currentFrame, Point sheetSize, Vector2 speed,
+            Dictionary<string, animate> animations)
             : this(textureImage, position, frameSize, frameStart, collisionOffset, scale, currentFrame,
-            sheetSize, speed, defaultMillisecondsPerFrame)
+            sheetSize, speed, defaultMillisecondsPerFrame, animations)
         {
         }
 
         public Sprite(Texture2D textureImage, Vector2 position, Point frameSize, Point frameStart,
             int collisionOffset, int scale, Point currentFrame, Point sheetSize, Vector2 speed,
-            int millisecondsPerFrame)
+            int millisecondsPerFrame, Dictionary<string, animate> animations)
         {
             this.textureImage = textureImage;
             this.position = position;
-            this.previousPosition = position;
             this.frameSize = frameSize;
-            this.frameStart = frameStart;
+
             this.collisionOffset = collisionOffset;
             this.scale = scale;
             this.currentFrame = currentFrame;
             this.sheetSize = sheetSize;
             this.speed = speed;
             this.millisecondsPerFrame = millisecondsPerFrame;
-            this.state = State.Stop;
+            state = State.Moving;
+
+            this.animations = animations;
+
+            defaultAnimation = animations["default"];
         }
 
         public virtual void Update(GameTime gameTime, Rectangle clientBounds)
         {
-            if (state == State.Moving)
+            timeSinceLastFrame += gameTime.ElapsedGameTime.Milliseconds;
+            if (timeSinceLastFrame > millisecondsPerFrame)
             {
-                timeSinceLastFrame += gameTime.ElapsedGameTime.Milliseconds;
-                if (timeSinceLastFrame > millisecondsPerFrame)
+                timeSinceLastFrame = 0;
+                ++currentFrame.X;
+                if (currentFrame.X >= sheetSize.X)
                 {
-                    timeSinceLastFrame = 0;
-                    ++currentFrame.X;
-                    if (currentFrame.X >= sheetSize.X)
-                    {
-                        currentFrame.X = 0;
-                        ++currentFrame.Y;
-                        if (currentFrame.Y >= sheetSize.Y)
-                            currentFrame.Y = 0;
-                    }
+                    currentFrame.X = 0;
+                    ++currentFrame.Y;
+                    if (currentFrame.Y >= sheetSize.Y)
+                        currentFrame.Y = 0;
                 }
             }
         }
 
         public virtual void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
-            if (state == State.Stop)
-            {
-                spriteBatch.Draw(textureImage,
-                    position,
-                    new Rectangle(animationStop.X,
-                        animationStop.Y,
-                        frameSize.X, frameSize.Y),
-                    Color.White, 0, Vector2.Zero,
-                    scale, SpriteEffects.None, 0);
-            }
-            else
-            {
-                spriteBatch.Draw(textureImage,
-                    position,
-                    new Rectangle(frameStart.X + currentFrame.X * frameSize.X,
-                        frameStart.Y + currentFrame.Y * frameSize.Y,
-                        frameSize.X, frameSize.Y),
-                    Color.White, 0, Vector2.Zero,
-                    scale, SpriteEffects.None, 0);
-            }
+            spriteBatch.Draw(textureImage,
+                position,
+                new Rectangle(frameStart.X + currentFrame.X * frameSize.X,
+                    frameStart.Y + currentFrame.Y * frameSize.Y,
+                    frameSize.X, frameSize.Y),
+                Color.White, 0, Vector2.Zero,
+                scale, SpriteEffects.None, 0);
         }
 
         public abstract Vector2 direction
