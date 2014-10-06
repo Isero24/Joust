@@ -13,18 +13,14 @@ namespace Joust
         public string animationName;
         public Point fStart;
         public Point sSize;
+        public Point fSize;
+        public SpriteEffects sEffect;
     }
-
-    enum State { Moving, Stop }
 
     abstract class Sprite
     {
         Texture2D textureImage;                         // Sprite or psrite sheet of image being drawn
-        protected Point frameSize;                      // Size of each individual frame in sprite sheet
-        protected Point frameStart;                     // Start location of the sprite on the sheet
-
-        Point currentFrame;                             // Index of current frame in sprite sheet
-        Point sheetSize;                                // Number of columns/rows in sprite sheet
+        protected Point currentFrame;                             // Index of current frame in sprite sheet
         int collisionOffset;                            // Offset used to modify frame-size rectangle for collision checks against this sprite
         int timeSinceLastFrame;                         // Number of milliseconds since last frame was drawn
         int millisecondsPerFrame;                       // Number of milliseconds to wait between frame changes
@@ -32,40 +28,26 @@ namespace Joust
         const int defaultMillisecondsPerFrame = 16;
         protected Vector2 speed;                        // Speed at which sprite will move in both X and Y directions
         protected Vector2 position;                     // Position at which to draw sprite
-        protected Vector2 previousPosition;             // Previous position of the sprite
 
-        public State state;
+        protected Dictionary<string, animate> animations;
 
-        Dictionary<string, animate> animations;
+        protected animate defaultAnimation;
 
-        animate defaultAnimation;
-
-        public Sprite(Texture2D textureImage, Vector2 position, Point frameSize, Point frameStart,
-            int collisionOffset, int scale, Point currentFrame, Point sheetSize, Vector2 speed,
-            Dictionary<string, animate> animations)
-            : this(textureImage, position, frameSize, frameStart, collisionOffset, scale, currentFrame,
-            sheetSize, speed, defaultMillisecondsPerFrame, animations)
+        public Sprite(Texture2D textureImage, Vector2 position, int collisionOffset, int scale, Point currentFrame, Vector2 speed, Dictionary<string, animate> animations)
+            : this(textureImage, position, collisionOffset, scale, currentFrame, speed, defaultMillisecondsPerFrame, animations)
         {
         }
 
-        public Sprite(Texture2D textureImage, Vector2 position, Point frameSize, Point frameStart,
-            int collisionOffset, int scale, Point currentFrame, Point sheetSize, Vector2 speed,
-            int millisecondsPerFrame, Dictionary<string, animate> animations)
+        public Sprite(Texture2D textureImage, Vector2 position, int collisionOffset, int scale, Point currentFrame, Vector2 speed, int millisecondsPerFrame, Dictionary<string, animate> animations)
         {
             this.textureImage = textureImage;
             this.position = position;
-            this.frameSize = frameSize;
-
             this.collisionOffset = collisionOffset;
             this.scale = scale;
             this.currentFrame = currentFrame;
-            this.sheetSize = sheetSize;
             this.speed = speed;
             this.millisecondsPerFrame = millisecondsPerFrame;
-            state = State.Moving;
-
             this.animations = animations;
-
             defaultAnimation = animations["default"];
         }
 
@@ -76,11 +58,11 @@ namespace Joust
             {
                 timeSinceLastFrame = 0;
                 ++currentFrame.X;
-                if (currentFrame.X >= sheetSize.X)
+                if (currentFrame.X >= defaultAnimation.sSize.X)
                 {
                     currentFrame.X = 0;
                     ++currentFrame.Y;
-                    if (currentFrame.Y >= sheetSize.Y)
+                    if (currentFrame.Y >= defaultAnimation.sSize.Y)
                         currentFrame.Y = 0;
                 }
             }
@@ -88,13 +70,18 @@ namespace Joust
 
         public virtual void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
-            spriteBatch.Draw(textureImage,
+            spriteBatch.Draw(
+                textureImage,
                 position,
-                new Rectangle(frameStart.X + currentFrame.X * frameSize.X,
-                    frameStart.Y + currentFrame.Y * frameSize.Y,
-                    frameSize.X, frameSize.Y),
-                Color.White, 0, Vector2.Zero,
-                scale, SpriteEffects.None, 0);
+                new Rectangle(  defaultAnimation.fStart.X + currentFrame.X * defaultAnimation.fSize.X,
+                                defaultAnimation.fStart.Y + currentFrame.Y * defaultAnimation.fSize.Y,
+                                defaultAnimation.fSize.X, 
+                                defaultAnimation.fSize.Y),
+                Color.White, 0, 
+                Vector2.Zero,
+                scale, 
+                defaultAnimation.sEffect, 
+                0);
         }
 
         public abstract Vector2 direction
@@ -109,8 +96,8 @@ namespace Joust
                 return new Rectangle(
                     (int)position.X + collisionOffset,
                     (int)position.Y + collisionOffset,
-                    frameSize.X - (collisionOffset * 2),
-                    frameSize.Y - (collisionOffset * 2));
+                    defaultAnimation.fSize.X - (collisionOffset * 2),
+                    defaultAnimation.fSize.Y - (collisionOffset * 2));
             }
         }
     }

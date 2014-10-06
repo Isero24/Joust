@@ -50,18 +50,33 @@ namespace Joust
             spriteBatch = new SpriteBatch(Game.GraphicsDevice);
 
             player = new UserControlledSprite(
-                Game.Content.Load<Texture2D>("JoustSheet"),
-                Vector2.Zero, new Point(15, 20), new Point(247, 62), 10, 3, new Point(0, 0),
-                new Point(4, 1), new Vector2(0, 0), 50,
-                new Dictionary<string, animate>()
+                Game.Content.Load<Texture2D>("JoustSheet"),                     // Loads the texture for the sprite
+                Vector2.Zero,                                                   // Sets the sprite position on screen
+                10,                                                             // Collision Offset
+                3,                                                              // Sprite scale
+                new Point(0, 0),                                                // Current frame in the animation
+                new Vector2(0, 0),                                              // Sprite movement speed
+                50,                                                             // sprite animation speed
+                new Dictionary<string, animate>()                               // Dictionary of animations for specific sprite
                 {
-                    {"default", new animate {animationName = "walking", fStart = new Point(247, 62), sSize = new Point(4, 1)}},
-                    {"walking", new animate {animationName = "walking", fStart = new Point(247, 62), sSize = new Point(4, 1)}}
+                    {"default", new animate {animationName = "stopped", fStart = new Point(247, 42), sSize = new Point(1, 1), fSize = new Point(15, 20)}},
+                    {"walking", new animate {animationName = "walking", fStart = new Point(247, 62), sSize = new Point(4, 1), fSize = new Point(15, 20)}}
                 }
 
-                );
-        
-            
+            );
+
+            background = new AutomatedSprite(
+                Game.Content.Load<Texture2D>("JoustSheet"),
+                Vector2.Zero,
+                10,
+                3,
+                new Point(0, 0),
+                new Vector2(0, 0),
+                new Dictionary<string, animate>()
+                {
+                    {"default", new animate {animationName = "background", fStart = new Point(2, 44), sSize = new Point(1, 1), fSize = new Point(237, 237)}}
+                }
+            );
 
             base.LoadContent();
         }

@@ -10,19 +10,13 @@ namespace Joust
 {
     class AutomatedSprite: Sprite
     {
-        public AutomatedSprite(Texture2D textureImage, Vector2 position, Point frameSize, Point frameStart,
-            int collisionOffset, int scale, Point currentFrame, Point sheetSize, Vector2 speed,
-            Dictionary<string, animate> animations)
-            : base(textureImage, position, frameSize, frameStart, collisionOffset, scale, currentFrame,
-            sheetSize, speed, animations)
+        public AutomatedSprite(Texture2D textureImage, Vector2 position, int collisionOffset, int scale, Point currentFrame, Vector2 speed, Dictionary<string, animate> animations)
+            : base(textureImage, position, collisionOffset, scale, currentFrame, speed, animations)
         {
         }
 
-        public AutomatedSprite(Texture2D textureImage, Vector2 position, Point frameSize, Point frameStart,
-            int collisionOffset, int scale, Point currentFrame, Point sheetSize, Vector2 speed,
-            int millisecondsPerFrame, Dictionary<string, animate> animations)
-            : base(textureImage, position, frameSize, frameStart, collisionOffset, scale, currentFrame,
-            sheetSize, speed, millisecondsPerFrame, animations)
+        public AutomatedSprite(Texture2D textureImage, Vector2 position, int collisionOffset, int scale, Point currentFrame, Vector2 speed, int millisecondsPerFrame, Dictionary<string, animate> animations)
+            : base(textureImage, position, collisionOffset, scale, currentFrame, speed, millisecondsPerFrame, animations)
         {
         }
 
