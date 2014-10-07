@@ -13,13 +13,13 @@ namespace Joust
     {
         KeyboardState oldKeyState;
 
-        public UserControlledSprite(Texture2D textureImage, Vector2 position, int collisionOffset, int scale, Point currentFrame, Vector2 speed, Dictionary<string, animate> animations)
-            : base(textureImage, position, collisionOffset, scale, currentFrame, speed, animations)
+        public UserControlledSprite(Texture2D textureImage, Vector2 position, int collisionOffset, Point currentFrame, Vector2 speed, Dictionary<string, animate> animations)
+            : base(textureImage, position, collisionOffset, currentFrame, speed, animations)
         {
         }
 
-        public UserControlledSprite(Texture2D textureImage, Vector2 position, int collisionOffset, int scale, Point currentFrame, Vector2 speed, int millisecondsPerFrame, Dictionary<string, animate> animations)
-            : base(textureImage, position, collisionOffset, scale, currentFrame, speed, millisecondsPerFrame, animations)
+        public UserControlledSprite(Texture2D textureImage, Vector2 position, int collisionOffset, Point currentFrame, Vector2 speed, int millisecondsPerFrame, Dictionary<string, animate> animations)
+            : base(textureImage, position, collisionOffset, currentFrame, speed, millisecondsPerFrame, animations)
         {
         }
 
@@ -27,26 +27,54 @@ namespace Joust
         {
             get
             {
+                
                 KeyboardState newKeyState = Keyboard.GetState();
 
                 Vector2 inputDirection = new Vector2(1, 1);
+
+                if (defaultAnimation.Equals(animations["flying"]))
+                {
+                    position.Y += 6;
+                    if (collisionCheck(Globals.spriteManager.wallList))
+                    {
+                        position.Y -= 6;
+                        if (!collisionCheck(Globals.spriteManager.wallList))
+                        {
+                            
+                            if (speed.X == 0)
+                            {
+                                defaultAnimation = animations["default"];
+                            }
+                            else
+                            {
+                                defaultAnimation = animations["walking"];
+                            }
+                        }
+                        
+                    }
+                }
 
                 if (newKeyState.IsKeyDown(Keys.Left))
                 {                    
                     if (speed.X > 0)
                     {
-                        defaultAnimation = animations["default"];
+                        if (!defaultAnimation.Equals(animations["flying"]))
+                        {
+                            defaultAnimation = animations["default"];
+                        }
                         speed.X = 0;
                     }
                     else if (oldKeyState.IsKeyUp(Keys.Left))
                     {
-                        defaultAnimation = animations["walking"];
+                        if (!defaultAnimation.Equals(animations["flying"]))
+                        {
+                            defaultAnimation = animations["walking"];
+                        }
 
                         if (speed.X > -3)
                         {
                             speed.X -= 1;
                         }
-
                     }
 
                     defaultAnimation.sEffect = SpriteEffects.FlipHorizontally;
@@ -56,12 +84,18 @@ namespace Joust
                 {
                     if (speed.X < 0)
                     {
-                        defaultAnimation = animations["default"];
+                        if (!defaultAnimation.Equals(animations["flying"]))
+                        {
+                            defaultAnimation = animations["default"];
+                        } 
                         speed.X = 0;
                     }
                     else if (oldKeyState.IsKeyUp(Keys.Right))
                     {
-                        defaultAnimation = animations["walking"];           
+                        if (!defaultAnimation.Equals(animations["flying"]))
+                        {
+                            defaultAnimation = animations["walking"];
+                        }
 
                         if (speed.X < 3)
                         {                           
@@ -73,6 +107,23 @@ namespace Joust
                     defaultAnimation.sEffect = SpriteEffects.None;
                 }
 
+                if (newKeyState.IsKeyDown(Keys.Space) && oldKeyState.IsKeyUp(Keys.Space))
+                {
+                    if (!defaultAnimation.Equals(animations["flying"]))
+                    {
+                        defaultAnimation = animations["flying"];
+                    }
+                    speed.Y = -6;
+                }
+                else
+                {
+                    if (speed.Y < 2)
+                    {
+                        speed.Y++;
+                    }
+                }
+
+
                 oldKeyState = newKeyState;
 
                 return inputDirection * speed;
@@ -82,14 +133,8 @@ namespace Joust
         public override void Update(GameTime gameTime, Rectangle clientBounds)
         {
             // Move the sprite based on direction
+            oldPosition = position;
             position += direction;
-
-            // If sprite is off the screen, move it back within the game window
-            if (position.X <= 0)
-                position.X = clientBounds.Width - defaultAnimation.fSize.X * scale;// +frameSize.X * scale;
-
-            if (position.X > clientBounds.Width - defaultAnimation.fSize.X * scale)
-                position.X = 0;
 
             base.Update(gameTime, clientBounds);
         }

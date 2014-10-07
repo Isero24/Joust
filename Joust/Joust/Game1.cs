@@ -16,12 +16,19 @@ namespace Joust
     /// <summary>
     /// This is the main type for your game
     /// </summary>
+    /// 
+
+    public static class Globals
+    {
+        public const Int32 SCALE = 3;
+        public static SpriteManager spriteManager;
+    }
+
     public class Game1 : Microsoft.Xna.Framework.Game
     {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
-
-        SpriteManager spriteManager;
+        Texture2D backgroundTexture;
 
         public Game1()
         {
@@ -39,8 +46,8 @@ namespace Joust
         {
             // TODO: Add your initialization logic here
 
-            spriteManager = new SpriteManager(this);
-            Components.Add(spriteManager);
+            Globals.spriteManager = new SpriteManager(this);
+            Components.Add(Globals.spriteManager);
 
             base.Initialize();
         }
@@ -53,6 +60,8 @@ namespace Joust
         {
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
+
+            backgroundTexture = Content.Load<Texture2D>("JoustSheet");
 
             // TODO: use this.Content to load your game content here
         }
@@ -79,8 +88,8 @@ namespace Joust
 
             // TODO: Add your update logic here
 
-            graphics.PreferredBackBufferHeight = 194*3;
-            graphics.PreferredBackBufferWidth = 236*3;
+            graphics.PreferredBackBufferHeight = 194 * Globals.SCALE;
+            graphics.PreferredBackBufferWidth = 235 * Globals.SCALE;
             graphics.ApplyChanges();
 
             base.Update(gameTime);
@@ -94,15 +103,51 @@ namespace Joust
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            // TODO: Add your drawing code here
+            spriteBatch.Begin(SpriteSortMode.Immediate,
+                    BlendState.AlphaBlend,
+                    SamplerState.PointClamp,
+                    null,
+                    null
+                    );
+
+            // Draw the background image
+            spriteBatch.Draw(
+                backgroundTexture,
+                new Vector2(0, 0) * Globals.SCALE,
+                new Rectangle(2, 44, 235, 237),
+                Color.White,
+                0,
+                Vector2.Zero,
+                Globals.SCALE,
+                SpriteEffects.None,
+                1);
+
+            spriteBatch.End();
 
             base.Draw(gameTime);
 
-        }
+            spriteBatch.Begin(SpriteSortMode.Immediate,
+                    BlendState.AlphaBlend,
+                    SamplerState.PointClamp,
+                    null,
+                    null
+                    );
 
-        protected void wait(int x)
-        {
-            for (int y = 0; y < x; y++) { }
+            spriteBatch.Draw(
+                backgroundTexture,
+                new Vector2(0, 168) * Globals.SCALE,
+                new Rectangle(2, 243, 236, 26),
+                Color.White,
+                0,
+                Vector2.Zero,
+                Globals.SCALE,
+                SpriteEffects.None,
+                1);
+
+            spriteBatch.End();
+
+            
+
         }
     }
 }

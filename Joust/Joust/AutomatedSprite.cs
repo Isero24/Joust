@@ -8,15 +8,15 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Joust
 {
-    class AutomatedSprite: Sprite
+    class AutomatedSprite : Sprite
     {
-        public AutomatedSprite(Texture2D textureImage, Vector2 position, int collisionOffset, int scale, Point currentFrame, Vector2 speed, Dictionary<string, animate> animations)
-            : base(textureImage, position, collisionOffset, scale, currentFrame, speed, animations)
+        public AutomatedSprite(Texture2D textureImage, Vector2 position, int collisionOffset, Point currentFrame, Vector2 speed, Dictionary<string, animate> animations)
+            : base(textureImage, position, collisionOffset, currentFrame, speed, animations)
         {
         }
 
-        public AutomatedSprite(Texture2D textureImage, Vector2 position, int collisionOffset, int scale, Point currentFrame, Vector2 speed, int millisecondsPerFrame, Dictionary<string, animate> animations)
-            : base(textureImage, position, collisionOffset, scale, currentFrame, speed, millisecondsPerFrame, animations)
+        public AutomatedSprite(Texture2D textureImage, Vector2 position, int collisionOffset, Point currentFrame, Vector2 speed, int millisecondsPerFrame, Dictionary<string, animate> animations)
+            : base(textureImage, position, collisionOffset, currentFrame, speed, millisecondsPerFrame, animations)
         {
         }
 
