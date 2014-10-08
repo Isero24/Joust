@@ -9,10 +9,6 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
 
-
-// YOU'RE CURRENT IMPLEMENTING THE STAND STILL FRAME WHEN NOT MOVING
-
-
 namespace Joust
 {
     /// <summary>
@@ -50,6 +46,7 @@ namespace Joust
         {
             spriteBatch = new SpriteBatch(Game.GraphicsDevice);
 
+            // The player controlled sprite is initiated along with it's animations.
             player = new UserControlledSprite(
                 Game.Content.Load<Texture2D>("JoustSheet"),                     // Loads the texture for the sprite
                 Vector2.Zero,                                                   // Sets the sprite position on screen
@@ -61,10 +58,12 @@ namespace Joust
                 {
                     {"default", new animate {animationName = "stopped", fStart = new Point(247, 42), sSize = new Point(1, 1), fSize = new Point(15, 20), millisecondsPerFrame = 50}},
                     {"walking", new animate {animationName = "walking", fStart = new Point(247, 62), sSize = new Point(4, 1), fSize = new Point(15, 20), millisecondsPerFrame = 50}},
-                    {"flying", new animate {animationName = "flying", fStart = new Point(247, 101), sSize = new Point(1, 1), fSize = new Point(15, 14), millisecondsPerFrame = 100}}
+                    {"flying", new animate {animationName = "flying", fStart = new Point(247, 101), sSize = new Point(2, 1), fSize = new Point(15, 14), millisecondsPerFrame = 100}}
                 }
             );
 
+            // A list of all the walls is populated. They are considered automated but the speed is set to 0 so they do not move.
+            // They are set as an invisible box.
             wallList.Add(new AutomatedSprite(
                 Game.Content.Load<Texture2D>("Image1"), new Vector2(198, 29) * Globals.SCALE, 10, new Point(0, 0), new Vector2(0, 0),
                 new Dictionary<string, animate>()
@@ -142,6 +141,16 @@ namespace Joust
                     {"default", new animate {animationName = "wall", fStart = new Point(2, 272), sSize = new Point(1, 1), fSize = new Point(48, 3)}}
                 }));
 
+
+            // The sprite list that has all the automated sprites that do move but are not player controlled.
+            spriteList.Add(new AutomatedSprite(
+                Game.Content.Load<Texture2D>("JoustSheet"), Vector2.Zero * Globals.SCALE, 10, new Point(0, 0), new Vector2(2, 2),
+                new Dictionary<string, animate>()
+                {
+                    {"default", new animate {animationName = "walking", fStart = new Point(247, 193), sSize = new Point(4, 1), fSize = new Point(15, 19), millisecondsPerFrame = 50}},
+                    {"flying", new animate {animationName = "flying", fStart = new Point(247, 213), sSize = new Point(2, 1), fSize = new Point(15, 14), millisecondsPerFrame = 100}}
+                }));
+
             base.LoadContent();
         }
 
@@ -156,27 +165,29 @@ namespace Joust
             // Update player
             player.Update(gameTime, Game.Window.ClientBounds);
 
+            // All the wall sprites are updated.
             foreach (Sprite s in wallList)
             {
                 s.Update(gameTime, Game.Window.ClientBounds);
-
-                //player.checkCollision(s, Game.Window.ClientBounds);
             }
 
-            player.findCollisions(wallList, Game.Window.ClientBounds);
+            // Each automated sprite in the spritelist is updated and checks for any collisions
+            foreach (Sprite s in spriteList)
+            {
+                s.Update(gameTime, Game.Window.ClientBounds);
+                s.findCollisions(wallList, Game.Window.ClientBounds);
+            }
 
-            // Update the automated sprites
-            //foreach (Sprite s in spriteList) 
-            //{ 
-            //    s.Update(gameTime, Game.Window.ClientBounds);
-            //}
+            // Checks for all player collisions with the walls
+            player.findCollisions(wallList, Game.Window.ClientBounds);
 
             base.Update(gameTime);
         }
 
         public override void Draw(GameTime gameTime)
         {
-            //spriteBatch.Begin(SpriteSortMode.FrontToBack, BlendState.AlphaBlend);
+            // Begins the sprite batch. It is setup in the way so that the sprites can be scalled while still maintaining
+            // a pixel look
             spriteBatch.Begin(SpriteSortMode.Immediate,
                     BlendState.AlphaBlend,
                     SamplerState.PointClamp,
@@ -186,6 +197,8 @@ namespace Joust
 
             // Draw the player
             player.Draw(gameTime, spriteBatch, Game.Window.ClientBounds);
+
+            // Draw the walls
             foreach (Sprite s in wallList)
                 s.Draw(gameTime, spriteBatch, Game.Window.ClientBounds);
 

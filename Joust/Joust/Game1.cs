@@ -20,8 +20,8 @@ namespace Joust
 
     public static class Globals
     {
-        public const Int32 SCALE = 3;
-        public static SpriteManager spriteManager;
+        public const Int32 SCALE = 3;                   // Global scale variable. Can't be changed.
+        public static SpriteManager spriteManager;      // Global sprite manager. Used for accessing the wallList on a global level
     }
 
     public class Game1 : Microsoft.Xna.Framework.Game
@@ -88,6 +88,7 @@ namespace Joust
 
             // TODO: Add your update logic here
 
+            // Screen size is updated that is set to the scale size
             graphics.PreferredBackBufferHeight = 194 * Globals.SCALE;
             graphics.PreferredBackBufferWidth = 235 * Globals.SCALE;
             graphics.ApplyChanges();
@@ -103,6 +104,7 @@ namespace Joust
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
+            // Sprite batch is setup so that the world is drawn with a pixelated look
             spriteBatch.Begin(SpriteSortMode.Immediate,
                     BlendState.AlphaBlend,
                     SamplerState.PointClamp,
@@ -110,7 +112,7 @@ namespace Joust
                     null
                     );
 
-            // Draw the background image
+            // Draw the background image first
             spriteBatch.Draw(
                 backgroundTexture,
                 new Vector2(0, 0) * Globals.SCALE,
@@ -124,8 +126,9 @@ namespace Joust
 
             spriteBatch.End();
 
-            base.Draw(gameTime);
+            base.Draw(gameTime); // All the sprites are drawn
 
+            // Sprite batch is restarted and the lava is drawn so that it is on top of the sprites
             spriteBatch.Begin(SpriteSortMode.Immediate,
                     BlendState.AlphaBlend,
                     SamplerState.PointClamp,
@@ -133,6 +136,7 @@ namespace Joust
                     null
                     );
 
+            // Draw the lava
             spriteBatch.Draw(
                 backgroundTexture,
                 new Vector2(0, 168) * Globals.SCALE,
